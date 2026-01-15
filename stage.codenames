@@ -1,0 +1,6 @@
+document.querySelectorAll('div[role="img"]').forEach(card => {
+    const targetLayer = card.querySelector('.cardImage');
+    if (targetLayer) {
+        targetLayer.click();
+    }
+});
