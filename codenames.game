@@ -1,21 +1,17 @@
 async function clickWordsSequentially() {
-    // 1. Select all the word containers
     const wordCards = document.querySelectorAll('article.font-futuraBold');
     
     console.log(`Found ${wordCards.length} cards. Starting clicks...`);
 
     for (let i = 0; i < wordCards.length; i++) {
-        // 2. Find the parent section to ensure the click is registered on the card
         const container = wordCards[i].closest('section.absolute');
         
         if (container) {
             const word = wordCards[i].innerText.trim();
             
-            // 3. Click the element
             container.click();
             console.log(`[${i + 1}/${wordCards.length}] Clicked: "${word}"`);
 
-            // 4. Wait for 1 second (1000ms) before the next iteration
             await new Promise(resolve => setTimeout(resolve, 165));
         }
     }
@@ -23,5 +19,4 @@ async function clickWordsSequentially() {
     console.log("Finished clicking all cards.");
 }
 
-// Run the function
 clickWordsSequentially();
