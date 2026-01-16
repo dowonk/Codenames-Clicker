@@ -103,8 +103,7 @@
   await delay(1000);
 
   // ======= Unclick all circle cards =======
-  const circleTabs = [0, 1, 2, 3, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24]; // Replace with your circle card indexes
-  for (const tab of circleTabs) {
+  for (const tab of borderTabs) {
     const card = cardsByTab[tab];
     if (!card) continue;
 
