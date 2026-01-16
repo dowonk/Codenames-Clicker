@@ -40,4 +40,28 @@
   }
 
   console.log('✅ Finished clicking and unclicking all 25 cards');
+
+  /* ============================
+     DRAW X ON THE BOARD (NO DELAY)
+     ============================ */
+
+  const xTabs = [0, 4, 6, 8, 12, 16, 18, 20, 24];
+
+  const cardsByTab = cards.reduce((map, card) => {
+    map[parseInt(card.getAttribute('tabindex'), 10)] = card;
+    return map;
+  }, {});
+
+  for (const tab of xTabs) {
+    const card = cardsByTab[tab];
+    if (!card) continue;
+
+    const target = card.querySelector('.cardImage');
+    if (!target) continue;
+
+    target.click();
+    console.log(`❌ X click tabindex ${tab}`);
+  }
+
+  console.log('❌ X drawn on the board (no delay)');
 })();
