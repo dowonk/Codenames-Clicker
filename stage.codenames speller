@@ -1,0 +1,75 @@
+(async () => {
+  const delay = ms => new Promise(res => setTimeout(res, ms));
+
+  /* 1. SETUP GRID DATA */
+  const cards = Array.from(document.querySelectorAll('div[role="img"]'))
+    .filter(card => card.hasAttribute('tabindex'))
+    .sort((a, b) => parseInt(a.getAttribute('tabindex'), 10) - parseInt(b.getAttribute('tabindex'), 10))
+    .slice(0, 25);
+
+  const cardsByTab = cards.reduce((map, card) => {
+    map[parseInt(card.getAttribute('tabindex'), 10)] = card;
+    return map;
+  }, {});
+
+  /* 2. MAXIMIZED ALPHABET MAP (5x5) */
+  const letterMap = {
+    'A': [2, 6, 8, 10, 14, 15, 16, 17, 18, 19, 20, 24],
+    'B': [0, 1, 2, 3, 5, 9, 10, 11, 12, 13, 15, 19, 20, 21, 22, 23],
+    'C': [0, 1, 2, 3, 4, 5, 10, 15, 20, 21, 22, 23, 24],
+    'D': [0, 1, 2, 3, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23],
+    'E': [0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24],
+    'F': [0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 20],
+    'G': [0, 1, 2, 3, 4, 5, 10, 12, 13, 14, 15, 19, 20, 21, 22, 23, 24],
+    'H': [0, 4, 5, 9, 10, 11, 12, 13, 14, 15, 19, 20, 24],
+    'I': [0, 1, 2, 3, 4, 7, 12, 17, 20, 21, 22, 23, 24],
+    'J': [4, 9, 14, 19, 20, 21, 22, 23, 24],
+    'K': [0, 4, 5, 8, 10, 11, 12, 15, 18, 20, 24],
+    'L': [0, 5, 10, 15, 20, 21, 22, 23, 24],
+    'M': [0, 4, 5, 6, 8, 9, 10, 12, 14, 15, 19, 20, 24],
+    'N': [0, 4, 5, 6, 9, 10, 12, 14, 15, 18, 19, 20, 24],
+    'O': [0, 1, 2, 3, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24],
+    'P': [0, 1, 2, 3, 4, 5, 9, 10, 11, 12, 13, 14, 15, 20],
+    'Q': [1, 2, 3, 5, 9, 10, 14, 15, 18, 19, 21, 22, 24],
+    'R': [0, 1, 2, 3, 4, 5, 9, 10, 11, 12, 13, 14, 15, 17, 20, 24],
+    'S': [0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 19, 20, 21, 22, 23, 24],
+    'T': [0, 1, 2, 3, 4, 7, 12, 17, 22],
+    'U': [0, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24],
+    'V': [0, 4, 5, 9, 10, 14, 16, 18, 22],
+    'W': [0, 4, 5, 9, 10, 14, 15, 17, 19, 20, 21, 23, 24],
+    'X': [0, 4, 6, 8, 12, 16, 18, 20, 24],
+    'Y': [0, 4, 5, 9, 11, 12, 13, 17, 22],
+    'Z': [0, 1, 2, 3, 4, 8, 12, 16, 20, 21, 22, 23, 24]
+  };
+
+  /* 3. DRAW FUNCTION */
+  async function drawLetter(char) {
+    const pattern = letterMap[char.toUpperCase()];
+    if (!pattern) return;
+
+    // Toggle ON
+    for (const tab of pattern) {
+      cardsByTab[tab]?.querySelector('.cardImage')?.click();
+    }
+
+    await delay(1200);
+
+    // Toggle OFF
+    for (const tab of pattern) {
+      cardsByTab[tab]?.querySelector('.cardImage')?.click();
+    }
+  }
+
+  /* 4. EXECUTION */
+  const rawInput = prompt("Type a word (spaces will be ignored):");
+  
+  if (rawInput) {
+    // Remove all spaces using regex
+    const cleanInput = rawInput.replace(/\s+/g, '');
+    
+    for (let char of cleanInput) {
+      await drawLetter(char);
+      await delay(150); // Small gap between letters
+    }
+  }
+})();
