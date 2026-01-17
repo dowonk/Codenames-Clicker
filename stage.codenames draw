@@ -4,7 +4,6 @@
   /* ============================
      COLLECT & SORT CARDS
      ============================ */
-
   const cards = Array.from(document.querySelectorAll('div[role="img"]'))
     .filter(card => card.hasAttribute('tabindex'))
     .sort((a, b) =>
@@ -18,101 +17,131 @@
     return map;
   }, {});
 
-  /* ============================
-     INITIAL SPIRAL SWIRL
-     (MAX 3 ACTIVE, 50ms DELAY)
-     ============================ */
-
   const size = 5;
-  const spiral = [];
 
-  let top = 0, bottom = size - 1;
-  let left = 0, right = size - 1;
+  /* ============================
+     SPIRAL CALCULATION
+     ============================ */
+  const spiral = [];
+  let top = 0, bottom = size - 1, left = 0, right = size - 1;
 
   while (top <= bottom && left <= right) {
     for (let c = left; c <= right; c++) spiral.push(top * size + c);
     top++;
-
     for (let r = top; r <= bottom; r++) spiral.push(r * size + right);
     right--;
-
     if (top <= bottom) {
       for (let c = right; c >= left; c--) spiral.push(bottom * size + c);
       bottom--;
     }
-
     if (left <= right) {
       for (let r = bottom; r >= top; r--) spiral.push(r * size + left);
       left++;
     }
   }
 
-  const active = [];
-
+  /* ============================
+     1. INITIAL SPIRAL SWIRL
+     ============================ */
+  let active = [];
   for (const tab of spiral) {
     const target = cardsByTab[tab]?.querySelector('.cardImage');
     if (!target) continue;
-
     target.click();
     active.push(target);
     await delay(50);
-
     if (active.length > 3) {
       const old = active.shift();
       old.click();
       await delay(50);
     }
   }
+  for (const target of active) { target.click(); await delay(50); }
 
-  // Clear all at center
-  for (const target of active) {
+  /* ============================
+     2. REVERSE SPIRAL SWIRL
+     ============================ */
+  active = [];
+  const reverseSpiral = spiral.slice().reverse();
+  for (const tab of reverseSpiral) {
+    const target = cardsByTab[tab]?.querySelector('.cardImage');
+    if (!target) continue;
     target.click();
+    active.push(target);
     await delay(50);
+    if (active.length > 3) {
+      const old = active.shift();
+      old.click();
+      await delay(50);
+    }
   }
+  for (const target of active) { target.click(); await delay(50); }
 
   /* ============================
-     DRAW X
+     3. SNAKE COLUMN PATTERN (Down-Up)
      ============================ */
+  active = [];
+  for (let c = 0; c < size; c++) {
+    const isEvenColumn = c % 2 === 0;
+    for (let r = 0; r < size; r++) {
+      const rowIdx = isEvenColumn ? r : (size - 1 - r);
+      const tab = rowIdx * size + c;
+      const target = cardsByTab[tab]?.querySelector('.cardImage');
+      if (!target) continue;
+      target.click();
+      active.push(target);
+      await delay(50);
+      if (active.length > 3) {
+        const old = active.shift();
+        old.click();
+        await delay(50);
+      }
+    }
+  }
+  for (const target of active) { target.click(); await delay(50); }
 
+  /* ============================
+     4. SNAKE ROW PATTERN (Right-Left Alternating)
+     ============================ */
+  active = [];
+  for (let r = 0; r < size; r++) {
+    // If row is even (0, 2, 4), go Left to Right. 
+    // If row is odd (1, 3), go Right to Left.
+    const isEvenRow = r % 2 === 0;
+    
+    for (let c = 0; c < size; c++) {
+      const colIdx = isEvenRow ? c : (size - 1 - c);
+      const tab = r * size + colIdx;
+
+      const target = cardsByTab[tab]?.querySelector('.cardImage');
+      if (!target) continue;
+
+      target.click();
+      active.push(target);
+      await delay(50);
+
+      if (active.length > 3) {
+        const old = active.shift();
+        old.click();
+        await delay(50);
+      }
+    }
+  }
+  for (const target of active) { target.click(); await delay(50); }
+
+  /* ============================
+     5. DRAW X
+     ============================ */
   const xTabs = [0, 4, 6, 8, 12, 16, 18, 20, 24];
-
-  for (const tab of xTabs) {
-    const target = cardsByTab[tab]?.querySelector('.cardImage');
-    if (!target) continue;
-    target.click();
-  }
-
+  for (const tab of xTabs) { cardsByTab[tab]?.querySelector('.cardImage')?.click(); }
   await delay(1000);
-
-  for (const tab of xTabs) {
-    const target = cardsByTab[tab]?.querySelector('.cardImage');
-    if (!target) continue;
-    target.click();
-  }
+  for (const tab of xTabs) { cardsByTab[tab]?.querySelector('.cardImage')?.click(); }
 
   /* ============================
-     DRAW OUTER BORDER
+     6. DRAW OUTER BORDER
      ============================ */
-
-  const borderTabs = [
-    0, 1, 2, 3, 4,
-    5, 9,
-    10, 14,
-    15, 19,
-    20, 21, 22, 23, 24
-  ];
-
-  for (const tab of borderTabs) {
-    const target = cardsByTab[tab]?.querySelector('.cardImage');
-    if (!target) continue;
-    target.click();
-  }
-
+  const borderTabs = [0, 1, 2, 3, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24];
+  for (const tab of borderTabs) { cardsByTab[tab]?.querySelector('.cardImage')?.click(); }
   await delay(1000);
-
-  for (const tab of borderTabs) {
-    const target = cardsByTab[tab]?.querySelector('.cardImage');
-    if (!target) continue;
-    target.click();
-  }
+  for (const tab of borderTabs) { cardsByTab[tab]?.querySelector('.cardImage')?.click(); }
 })();
