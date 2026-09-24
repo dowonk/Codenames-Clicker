@@ -1,22 +1,9 @@
-async function clickWordsSequentially() {
-    const wordCards = document.querySelectorAll('article.font-futuraBold');
-    
-    console.log(`Found ${wordCards.length} cards. Starting clicks...`);
+const cards = document.querySelectorAll('section.absolute.inset-0.w-full.h-full.rounded-\\(--CardRadius\\)');
 
-    for (let i = 0; i < wordCards.length; i++) {
-        const container = wordCards[i].closest('section.absolute');
-        
-        if (container) {
-            const word = wordCards[i].innerText.trim();
-            
-            container.click();
-            console.log(`[${i + 1}/${wordCards.length}] Clicked: "${word}"`);
+cards.forEach((card, index) => {
+  ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(eventType => {
+    card.dispatchEvent(new MouseEvent(eventType, { bubbles: true, cancelable: true, view: window }));
+  });
+});
 
-            await new Promise(resolve => setTimeout(resolve, 170));
-        }
-    }
-    
-    console.log("Finished clicking all cards.");
-}
-
-clickWordsSequentially();
+console.log(`Successfully clicked all ${cards.length} cards.`);
