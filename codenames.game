@@ -1,3 +1,5 @@
+CLICK ALL
+----------
 const cards = document.querySelectorAll('section.absolute.inset-0.w-full.h-full.rounded-\\(--CardRadius\\)');
 
 cards.forEach((card, index) => {
@@ -7,3 +9,173 @@ cards.forEach((card, index) => {
 });
 
 console.log(`Successfully clicked all ${cards.length} cards.`);
+
+SNAKE
+----------
+const cards = document.querySelectorAll('section.absolute.inset-0.w-full.h-full.rounded-\\(--CardRadius\\)');
+
+if (cards.length === 0) {
+    console.error("No cards found! Check your selector.");
+} else {
+    const forwardPath = [];
+
+    for (let c = 0; c < 5; c++) forwardPath.push({r: 0, c});
+    for (let r = 1; r < 5; r++) forwardPath.push({r, c: 4});
+    for (let c = 3; c >= 0; c--) forwardPath.push({r: 4, c});
+    for (let r = 3; r >= 1; r--) forwardPath.push({r, c: 0});
+
+    forwardPath.push({r: 1, c: 1});
+    forwardPath.push({r: 1, c: 2});
+    forwardPath.push({r: 1, c: 3});
+    forwardPath.push({r: 2, c: 3});
+    forwardPath.push({r: 3, c: 3});
+    forwardPath.push({r: 3, c: 2});
+    forwardPath.push({r: 3, c: 1});
+    forwardPath.push({r: 2, c: 1});
+    forwardPath.push({r: 2, c: 2});
+
+    const backwardPath = [...forwardPath].reverse();
+
+    function clickCard(card) {
+        ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(eventType => {
+            card.dispatchEvent(new MouseEvent(eventType, { bubbles: true, cancelable: true, view: window }));
+        });
+    }
+
+    (async () => {
+        const activeIndices = new Set();
+
+        for (let i = 0; i < 3; i++) {
+            const {r, c} = forwardPath[i];
+            const index = r * 5 + c;
+            const card = cards[index];
+            if (card) {
+                clickCard(card);
+                activeIndices.add(index);
+            }
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 250));
+
+        for (let i = 3; i < forwardPath.length; i++) {
+            const headPos = forwardPath[i];
+            const headIndex = headPos.r * 5 + headPos.c;
+            const headCard = cards[headIndex];
+
+            const tailPos = forwardPath[i - 3];
+            const tailIndex = tailPos.r * 5 + tailPos.c;
+            const tailCard = cards[tailIndex];
+
+            if (headCard) {
+                clickCard(headCard);
+                activeIndices.add(headIndex);
+            }
+            if (tailCard) {
+                clickCard(tailCard);
+                activeIndices.delete(tailIndex);
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 250));
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 250));
+
+        for (let i = 3; i < backwardPath.length; i++) {
+            const headPos = backwardPath[i];
+            const headIndex = headPos.r * 5 + headPos.c;
+            const headCard = cards[headIndex];
+
+            const tailPos = backwardPath[i - 3];
+            const tailIndex = tailPos.r * 5 + tailPos.c;
+            const tailCard = cards[tailIndex];
+
+            if (headCard) {
+                clickCard(headCard);
+                activeIndices.add(headIndex);
+            }
+            if (tailCard) {
+                clickCard(tailCard);
+                activeIndices.delete(tailIndex);
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 250));
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 250));
+
+        for (const index of activeIndices) {
+            const card = cards[index];
+            if (card) {
+                clickCard(card);
+            }
+        }
+
+        console.log("Snake went inward, outward, and board cleared!");
+    })();
+}
+
+X AND O
+----------
+const cards = document.querySelectorAll('section.absolute.inset-0.w-full.h-full.rounded-\\(--CardRadius\\)');
+
+if (cards.length === 0) {
+    console.error("No cards found! Check your selector.");
+} else {
+    function clickCard(card) {
+        ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(eventType => {
+            card.dispatchEvent(new MouseEvent(eventType, { bubbles: true, cancelable: true, view: window }));
+        });
+    }
+    
+    const xCoordinates = [];
+    for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 5; c++) {
+            if (r === c || r + c === 4) {
+                xCoordinates.push({r, c});
+            }
+        }
+    }
+
+    const oCoordinates = [];
+    for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 5; c++) {
+            if (r === 0 || r === 4 || c === 0 || c === 4) {
+                oCoordinates.push({r, c});
+            }
+        }
+    }
+
+    (async () => {
+        console.log("Drawing X...");
+        for (const pos of xCoordinates) {
+            const card = cards[pos.r * 5 + pos.c];
+            if (card) clickCard(card);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        console.log("Clearing board...");
+        for (const pos of xCoordinates) {
+            const card = cards[pos.r * 5 + pos.c];
+            if (card) clickCard(card); // clicking them again unclicks/clears them
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        console.log("Drawing O...");
+        for (const pos of oCoordinates) {
+            const card = cards[pos.r * 5 + pos.c];
+            if (card) clickCard(card);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        console.log("Drawing O...");
+        for (const pos of oCoordinates) {
+            const card = cards[pos.r * 5 + pos.c];
+            if (card) clickCard(card);
+        }
+
+        console.log("X and O sequence finished!");
+    })();
+}
